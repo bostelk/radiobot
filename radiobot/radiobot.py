@@ -245,20 +245,24 @@ def playlists_title_to_id():
     return title_to_id
 
 if __name__ == "__main__":
-    # cache the playlists on start.
-    existing_playlists.update(playlists_title_to_id())
-
-    # create radiolounge playlists if needed.
-    if not RADIOLOUNGE_PLAYLIST_TITLE in existing_playlists:
-        new_id = create_youtube_playlist(RADIOLOUNGE_PLAYLIST_TITLE)
-        existing_playlists[RADIOLOUNGE_PLAYLIST_TITLE] = new_id
-    if not RADIOLOUNGE_ALBUM_PLAYLIST_TITLE in existing_playlists:
-        new_id = create_youtube_playlist(RADIOLOUNGE_ALBUM_PLAYLIST_TITLE)
-        existing_playlists[RADIOLOUNGE_ALBUM_PLAYLIST_TITLE] = new_id
-
     READ_WEBSOCKET_DELAY = 1 # seconds
     if slack_client.rtm_connect():
         print("RadioBot connected and running!")
+
+        # cache the playlists on start.
+        existing_playlists.update(playlists_title_to_id())
+        print("Cached existing playlists!")
+
+        # create radiolounge playlists if needed.
+        if not RADIOLOUNGE_PLAYLIST_TITLE in existing_playlists:
+            new_id = create_youtube_playlist(RADIOLOUNGE_PLAYLIST_TITLE)
+            existing_playlists[RADIOLOUNGE_PLAYLIST_TITLE] = new_id
+            print("Created " + RADIOLOUNGE_PLAYLIST_TITLE + " playlist")
+        if not RADIOLOUNGE_ALBUM_PLAYLIST_TITLE in existing_playlists:
+            new_id = create_youtube_playlist(RADIOLOUNGE_ALBUM_PLAYLIST_TITLE)
+            existing_playlists[RADIOLOUNGE_ALBUM_PLAYLIST_TITLE] = new_id
+            print("Created " + RADIOLOUNGE_ALBUM_PLAYLIST_TITLE + " playlist")
+
         while True:
             radiobot_do_work(slack_client.rtm_read())
             time.sleep(READ_WEBSOCKET_DELAY)
@@ -269,3 +273,4 @@ if __name__ == "__main__":
 # TODO:
 # - Deal with "playlist full" response
 # - Spotify, I _suppose_ (edited)
+# - Quota reached exceptions
